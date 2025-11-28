@@ -1,4 +1,4 @@
-package cotuba;
+package cotuba.domain;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -8,7 +8,7 @@ public class Ebook {
     private String content;
     private String format;
     private Path outputPath;
-    private List<cotuba.Chapter> chapters;
+    private List<Chapter> chapters;
 
     public boolean isLastChapter(Chapter chapter) {
         return this.chapters.get(this.chapters.size() - 1).equals(chapter);
@@ -22,7 +22,7 @@ public class Ebook {
         this.outputPath = outputPath;
     }
 
-    public void setChapters(List<cotuba.Chapter> chapters) {
+    public void setChapters(List<Chapter> chapters) {
         this.chapters = chapters;
     }
 
@@ -34,7 +34,7 @@ public class Ebook {
         return outputPath;
     }
 
-    public List<cotuba.Chapter> getChapters() {
+    public List<Chapter> getChapters() {
         return chapters;
     }
 

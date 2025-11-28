@@ -1,6 +1,9 @@
 package cotuba;
 
-import org.apache.commons.cli.Options;
+import cotuba.application.Cotuba;
+import cotuba.cli.OptionsReaderCLI;
+import cotuba.domain.Chapter;
+import cotuba.renderer.MarkdownToHtmlRenderer;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;

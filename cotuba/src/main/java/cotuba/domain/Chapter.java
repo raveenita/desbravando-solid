@@ -1,6 +1,4 @@
-package cotuba;
-
-import java.util.List;
+package cotuba.domain;
 
 public class Chapter
 {

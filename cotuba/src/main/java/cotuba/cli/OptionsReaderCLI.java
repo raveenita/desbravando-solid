@@ -1,4 +1,4 @@
-package cotuba;
+package cotuba.cli;
 
 import org.apache.commons.cli.*;
 
@@ -9,6 +9,37 @@ public class OptionsReaderCLI {
     private String format;
     private Path output;
     private Boolean isVerboseMode;
+
+    public OptionsReaderCLI(Path markdownDir, String format, Path output, Boolean isVerboseMode) {
+        this.markdownDir = markdownDir;
+        this.format = format;
+        this.output = output;
+        this.isVerboseMode = isVerboseMode;
+    }
+
+    private Options createOptions() {
+
+    }
+
+    private CommandLine parseArguments(String[] args, Options options) {
+
+    }
+
+    private void resolveMarkdownDirectory(CommandLine cmd) {
+
+    }
+
+    private void resolveFormat() {
+
+    }
+
+    private void resolveOutputFIle() {
+
+    }
+
+    private void resolveVerboseMode() {
+
+    }
 
     public void setFormat(String format) {
         this.format = format;
@@ -44,18 +75,18 @@ public class OptionsReaderCLI {
     }
 
     public OptionsReaderCLI(String[] args) {
-        Options options = getOptions();
+        CommandLine cmd;
         CommandLineParser cmdParser = new DefaultParser();
+
+        Options options = getOptions();
         HelpFormatter helper = new HelpFormatter();
 
+
         try {
-            CommandLine cmd;
             cmd = cmdParser.parse(options, args);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
+        } catch (IllegalArgumentException e) {
             helper.printHelp("cotuba", options);
-            System.exit(1);
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Invalid option", e);
         }
     }
 
