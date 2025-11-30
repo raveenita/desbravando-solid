@@ -12,8 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
-public class EpubGeneratorImpl implements EpubGenerator {
-    public EpubGeneratorImpl() {}
+public class EpubGeneratorWithEpublib implements EpubGenerator {
+    public EpubGeneratorWithEpublib() {}
 
     @Override
     public void generate (Ebook ebook) {

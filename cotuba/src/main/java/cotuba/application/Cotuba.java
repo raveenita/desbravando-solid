@@ -3,30 +3,27 @@ package cotuba.application;
 import cotuba.domain.Chapter;
 import cotuba.domain.Ebook;
 import cotuba.epub.EpubGenerator;
-import cotuba.epub.EpubGeneratorImpl;
 import cotuba.pdf.PdfGenerator;
-import cotuba.pdf.PdfGeneratorImpl;
 import cotuba.renderer.MarkdownToHtmlRenderer;
-import cotuba.renderer.MarkdownToHtmlRendererImpl;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public class Cotuba {
-    public void execute(String format, Path markdownDirectory, Path outputFile) {
-        MarkdownToHtmlRenderer markdownToHtmlRenderer = new MarkdownToHtmlRendererImpl();
-        List<Chapter> chapters = markdownToHtmlRenderer.renderer(outputFile);
+    public void execute(CotubaArgs options) {
+        MarkdownToHtmlRenderer markdownToHtmlRenderer = MarkdownToHtmlRenderer.create();
+        List<Chapter> chapters = markdownToHtmlRenderer.renderer(options.getOutputFile());
         Ebook ebook = new Ebook();
 
-        ebook.setFormat(format);
-        ebook.setOutputPath(outputFile);
+        ebook.setFormat(options.getFormat());
+        ebook.setOutputPath(options.getOutputFile());
 
-        if ("pdf".equals(format)) {
-            PdfGenerator pdfGenerator = new PdfGeneratorImpl();
+        if ("pdf".equals(options.getFormat())) {
+            PdfGenerator pdfGenerator = PdfGenerator.create();
             pdfGenerator.generate(ebook);
 
-        } else if ("epub".equals(format)) {
-            EpubGenerator epubGenerator = new EpubGeneratorImpl();
+        } else if ("epub".equals(options.getFormat())) {
+            EpubGenerator epubGenerator = EpubGenerator.create();
             epubGenerator.generate(ebook);
         }
     }

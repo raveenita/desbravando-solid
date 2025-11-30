@@ -2,7 +2,7 @@ package cotuba.application;
 
 import cotuba.cli.OptionsReaderCLI;
 import cotuba.domain.Chapter;
-import cotuba.renderer.MarkdownToHtmlRendererImpl;
+import cotuba.renderer.MarkdownToHtmlRendererWithCommonMark;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -13,24 +13,21 @@ import java.util.List;
 public class Main {
 
   public static void main(String[] args) {
-      OptionsReaderCLI optionsReaderCLI = new OptionsReaderCLI(args);
-      MarkdownToHtmlRendererImpl markdownToHtml = new MarkdownToHtmlRendererImpl();
-      String format = optionsReaderCLI.getFormat();
-      Path markdownDirectory = optionsReaderCLI.getMarkdownDirectory();
-      Path outputFile = optionsReaderCLI.getOutputFile();
-      List<Chapter> chapters = markdownToHtml.renderer(outputFile);
+      OptionsReaderCLI options = new OptionsReaderCLI(args);
+      MarkdownToHtmlRendererWithCommonMark markdownToHtml = new MarkdownToHtmlRendererWithCommonMark();
+      List<Chapter> chapters = markdownToHtml.renderer(options.getOutputFile());
 
       try {
           Cotuba cotuba = new Cotuba();
-          cotuba.execute(format, markdownDirectory, outputFile);
+          cotuba.execute(options);
 
       } catch (Exception ex) {
-          boolean isVerboseMode = optionsReaderCLI.isVerboseMode();
+          boolean isVerboseMode = options.isVerboseMode();
 
           System.err.println(ex.getMessage());
           PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
 
-          System.out.println("Arquivo gerado com sucesso" + outputFile);
+          System.out.println("Arquivo gerado com sucesso" + options.getOutputFile());
 
           if (isVerboseMode) {
               ex.printStackTrace();

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class MarkdownToHtmlRendererImpl implements MarkdownToHtmlRenderer {
+public class MarkdownToHtmlRendererWithCommonMark implements MarkdownToHtmlRenderer {
     List<Chapter> chapters = new ArrayList<>();
 
     public List<Chapter> renderer(Path markdownDirectory ) {

@@ -16,8 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.PathMatcher;
 import java.util.List;
 
-public class PdfGeneratorImpl implements PdfGenerator {
-    public PdfGeneratorImpl() {
+
+public class PdfGeneratorWithIText implements PdfGenerator {
+    public PdfGeneratorWithIText() {
     }
 
     @Override

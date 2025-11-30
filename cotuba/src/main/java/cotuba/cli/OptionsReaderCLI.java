@@ -1,5 +1,8 @@
 package cotuba.cli;
 
+import cotuba.application.CotubaArgs;
+import cotuba.renderer.MarkdownToHtmlRenderer;
+import cotuba.renderer.MarkdownToHtmlRendererWithCommonMark;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -9,13 +12,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 
-class OptionsReaderCLI {
+public class OptionsReaderCLI implements CotubaArgs {
 
     private Path markdownDirectory;
     private String format;
     private Path outputFile;
     private boolean verboseMode = false;
 
+
+    static MarkdownToHtmlRenderer create() {
+        return new MarkdownToHtmlRendererWithCommonMark();
+    }
 
     public OptionsReaderCLI(String[] args) {
         Options options = createOptions();
