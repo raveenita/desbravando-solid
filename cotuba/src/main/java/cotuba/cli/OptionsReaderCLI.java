@@ -2,114 +2,140 @@ package cotuba.cli;
 
 import org.apache.commons.cli.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 
-public class OptionsReaderCLI {
-    private Path markdownDir;
+class OptionsReaderCLI {
+
+    private Path markdownDirectory;
     private String format;
-    private Path output;
-    private Boolean isVerboseMode;
+    private Path outputFile;
+    private boolean verboseMode = false;
 
-    public OptionsReaderCLI(Path markdownDir, String format, Path output, Boolean isVerboseMode) {
-        this.markdownDir = markdownDir;
-        this.format = format;
-        this.output = output;
-        this.isVerboseMode = isVerboseMode;
+
+    public OptionsReaderCLI(String[] args) {
+        Options options = createOptions();
+        CommandLine cmd = parseDosArgumentos(args, options);
+        resolveMarkdownDirectory(cmd);
+        resolveFormat(cmd);
+        resolveOutputFile(cmd);
+        resolveVerboseMode(cmd);
     }
 
-    private Options createOptions() {
-
-    }
-
-    private CommandLine parseArguments(String[] args, Options options) {
-
-    }
-
-    private void resolveMarkdownDirectory(CommandLine cmd) {
-
-    }
-
-    private void resolveFormat() {
-
-    }
-
-    private void resolveOutputFIle() {
-
-    }
-
-    private void resolveVerboseMode() {
-
+    public void setMarkdownDirectory(Path markdownDirectory) {
+        this.markdownDirectory = markdownDirectory;
     }
 
     public void setFormat(String format) {
         this.format = format;
     }
 
-    public Path getMarkdownDir() {
-        return markdownDir;
+    public void setOutputFile(Path outputFile) {
+        this.outputFile = outputFile;
     }
 
-    public Path getOutput() {
-        return output;
+    public void setVerboseMode(boolean verboseMode) {
+        this.verboseMode = verboseMode;
     }
 
-    public void setMarkdownDir(Path markdownDir) {
-        this.markdownDir = markdownDir;
+    public Path getMarkdownDirectory() {
+        return markdownDirectory;
     }
-
-    public void setOutput(Path output) {
-        this.output = output;
-    }
-
-    public void setVerboseMode(Boolean verboseMode) {
-        isVerboseMode = verboseMode;
-    }
-
 
     public String getFormat() {
         return format;
     }
 
-    public Boolean getVerboseMode() {
-        return isVerboseMode;
+    public Path getOutputFile() {
+        return outputFile;
     }
 
-    public OptionsReaderCLI(String[] args) {
-        CommandLine cmd;
+    public boolean isVerboseMode() {
+        return verboseMode;
+    }
+
+    private Options createOptions() {
+        var options = new Options();
+
+        var opcaoDeDiretorioDosMD = new Option("d", "dir", true,
+                "Diretório que contém os arquivos md. Default: diretório atual.");
+        options.addOption(opcaoDeDiretorioDosMD);
+
+        var opcaoDeFormatoDoEbook = new Option("f", "format", true,
+                "Formato de saída do ebook. Pode ser: pdf ou epub. Default: pdf");
+        options.addOption(opcaoDeFormatoDoEbook);
+
+        var opcaoDeArquivoDeSaida = new Option("o", "output", true,
+                "Arquivo de saída do ebook. Default: book.{formato}.");
+        options.addOption(opcaoDeArquivoDeSaida);
+
+        var opcaoModoVerboso = new Option("v", "verbose", false,
+                "Habilita modo verboso.");
+        options.addOption(opcaoModoVerboso);
+        return options;
+    }
+
+    private CommandLine parseDosArgumentos(String[] args, Options options) {
         CommandLineParser cmdParser = new DefaultParser();
-
-        Options options = getOptions();
-        HelpFormatter helper = new HelpFormatter();
-
+        var ajuda = new HelpFormatter();
+        CommandLine cmd;
 
         try {
             cmd = cmdParser.parse(options, args);
-        } catch (IllegalArgumentException e) {
-            helper.printHelp("cotuba", options);
-            throw new IllegalArgumentException("Invalid option", e);
+        } catch (ParseException e) {
+            ajuda.printHelp("cotuba", options);
+            throw new IllegalArgumentException("Opção inválida", e);
+        }
+        return cmd;
+    }
+
+    private void resolveMarkdownDirectory(CommandLine cmd) {
+        String markdownDir = cmd.getOptionValue("dir");
+        if (markdownDir != null) {
+            Path markdownDirPath = Paths.get(markdownDir);
+            if (!Files.isDirectory(markdownDirectory)) {
+                throw new IllegalArgumentException(markdownDir + " não é um diretório.");
+            }
+        } else {
+            markdownDirectory = Paths.get("");
         }
     }
 
-    public Options getOptions() {
-        Options options = new Options();
+    private void resolveFormat(CommandLine cmd) {
+        String ebookFormat = cmd.getOptionValue("format");
+        if (ebookFormat != null) {
+            format = ebookFormat.toLowerCase();
+        } else {
+            format = "pdf";
+        }
+    }
 
-        Option markdownDirectory = new Option("d", "markdownDir", true,
-                "Diretório que contém os arquivos md. Default: diretório atual.");
+    private void resolveOutputFile(CommandLine cmd) {
+        try {
+            String markdownOutputFile = cmd.getOptionValue("output");
 
-        options.addOption(markdownDirectory);
+            if (markdownOutputFile != null) {
+                outputFile = Paths.get(markdownOutputFile);
+            } else {
+                outputFile = Paths.get("book." + format.toLowerCase());
+            }
+            if (Files.isDirectory(outputFile)) {
+                // deleta arquivos do diretório recursivamente
+                Files.walk(outputFile).sorted(Comparator.reverseOrder())
+                        .map(Path::toFile).forEach(File::delete);
+            } else {
+                Files.deleteIfExists(outputFile);
+            }
+        } catch (IOException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
 
-        Option ebookFormat = new Option("f", "format", true,
-                "Formato de saída do ebook. Pode ser: pdf ou epub. Default: pdf");
-        options.addOption(ebookFormat);
-
-        Option outputFiles = new Option("o", "output", true,
-                "Arquivo de saída do ebook. Default: book.{formato}.");
-        options.addOption(outputFiles);
-
-        var isVerboseMode = new Option("v", "verbose", false,
-                "Habilita modo verboso.");
-        options.addOption(isVerboseMode);
-
-        return options;
+    private void resolveVerboseMode(CommandLine cmd) {
+        verboseMode = cmd.hasOption("verbose");
     }
 }

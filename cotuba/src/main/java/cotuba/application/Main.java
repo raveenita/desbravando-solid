@@ -1,9 +1,8 @@
-package cotuba;
+package cotuba.application;
 
-import cotuba.application.Cotuba;
 import cotuba.cli.OptionsReaderCLI;
 import cotuba.domain.Chapter;
-import cotuba.renderer.MarkdownToHtmlRenderer;
+import cotuba.renderer.MarkdownToHtmlRendererImpl;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -15,10 +14,10 @@ public class Main {
 
   public static void main(String[] args) {
       OptionsReaderCLI optionsReaderCLI = new OptionsReaderCLI(args);
-      MarkdownToHtmlRenderer markdownToHtml = new MarkdownToHtmlRenderer();
+      MarkdownToHtmlRendererImpl markdownToHtml = new MarkdownToHtmlRendererImpl();
       String format = optionsReaderCLI.getFormat();
-      Path markdownDirectory = optionsReaderCLI.getMarkdownDir();
-      Path outputFile = optionsReaderCLI.getOutput();
+      Path markdownDirectory = optionsReaderCLI.getMarkdownDirectory();
+      Path outputFile = optionsReaderCLI.getOutputFile();
       List<Chapter> chapters = markdownToHtml.renderer(outputFile);
 
       try {
@@ -26,7 +25,7 @@ public class Main {
           cotuba.execute(format, markdownDirectory, outputFile);
 
       } catch (Exception ex) {
-          Boolean isVerboseMode = optionsReaderCLI.getVerboseMode();
+          boolean isVerboseMode = optionsReaderCLI.isVerboseMode();
 
           System.err.println(ex.getMessage());
           PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");
