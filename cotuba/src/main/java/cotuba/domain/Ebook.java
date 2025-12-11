@@ -6,7 +6,7 @@ import java.util.List;
 public class Ebook {
     private String title;
     private String content;
-    private String format;
+    private EbookFormat format;
     private Path outputPath;
     private List<Chapter> chapters;
 
@@ -14,7 +14,11 @@ public class Ebook {
         return this.chapters.get(this.chapters.size() - 1).equals(chapter);
     }
 
-    public void setFormat(String format) {
+    public EbookFormat getFormat() {
+        return format;
+    }
+
+    public void setFormat(EbookFormat format) {
         this.format = format;
     }
 
@@ -26,9 +30,6 @@ public class Ebook {
         this.chapters = chapters;
     }
 
-    public String getFormat() {
-        return format;
-    }
 
     public Path getOutputPath() {
         return outputPath;

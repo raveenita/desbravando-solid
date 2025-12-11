@@ -1,9 +1,11 @@
 package cotuba.application;
 
+import cotuba.domain.EbookFormat;
+
 import java.nio.file.Path;
 
 public interface CotubaArgs {
     Path getMarkdownDirectory();
-    String getFormat();
+    EbookFormat getFormat();
     Path getOutputFile();
 }

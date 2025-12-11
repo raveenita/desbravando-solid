@@ -1,8 +1,7 @@
 package cotuba.cli;
 
 import cotuba.application.CotubaArgs;
-import cotuba.renderer.MarkdownToHtmlRenderer;
-import cotuba.renderer.MarkdownToHtmlRendererWithCommonMark;
+import cotuba.domain.EbookFormat;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -15,30 +14,30 @@ import java.util.Comparator;
 public class OptionsReaderCLI implements CotubaArgs {
 
     private Path markdownDirectory;
-    private String format;
+    private EbookFormat format;
     private Path outputFile;
     private boolean verboseMode = false;
 
-
-    static MarkdownToHtmlRenderer create() {
-        return new MarkdownToHtmlRendererWithCommonMark();
-    }
-
     public OptionsReaderCLI(String[] args) {
         Options options = createOptions();
-        CommandLine cmd = parseDosArgumentos(args, options);
+        CommandLine cmd = parseArgs(args, options);
         resolveMarkdownDirectory(cmd);
         resolveFormat(cmd);
         resolveOutputFile(cmd);
         resolveVerboseMode(cmd);
     }
 
-    public void setMarkdownDirectory(Path markdownDirectory) {
-        this.markdownDirectory = markdownDirectory;
+    @Override
+    public EbookFormat getFormat() {
+        return format;
     }
 
-    public void setFormat(String format) {
+    public void setFormat(EbookFormat format) {
         this.format = format;
+    }
+
+    public void setMarkdownDirectory(Path markdownDirectory) {
+        this.markdownDirectory = markdownDirectory;
     }
 
     public void setOutputFile(Path outputFile) {
@@ -51,10 +50,6 @@ public class OptionsReaderCLI implements CotubaArgs {
 
     public Path getMarkdownDirectory() {
         return markdownDirectory;
-    }
-
-    public String getFormat() {
-        return format;
     }
 
     public Path getOutputFile() {
@@ -86,15 +81,15 @@ public class OptionsReaderCLI implements CotubaArgs {
         return options;
     }
 
-    private CommandLine parseDosArgumentos(String[] args, Options options) {
+    private CommandLine parseArgs(String[] args, Options options) {
         CommandLineParser cmdParser = new DefaultParser();
-        var ajuda = new HelpFormatter();
+        var helper = new HelpFormatter();
         CommandLine cmd;
 
         try {
             cmd = cmdParser.parse(options, args);
         } catch (ParseException e) {
-            ajuda.printHelp("cotuba", options);
+            helper.printHelp("cotuba", options);
             throw new IllegalArgumentException("Opção inválida", e);
         }
         return cmd;
@@ -114,11 +109,9 @@ public class OptionsReaderCLI implements CotubaArgs {
 
     private void resolveFormat(CommandLine cmd) {
         String ebookFormat = cmd.getOptionValue("format");
-        if (ebookFormat != null) {
-            format = ebookFormat.toLowerCase();
-        } else {
-            format = "pdf";
-        }
+
+        format = EbookFormat.valueOf(ebookFormat.toUpperCase());
+
     }
 
     private void resolveOutputFile(CommandLine cmd) {
@@ -128,7 +121,7 @@ public class OptionsReaderCLI implements CotubaArgs {
             if (markdownOutputFile != null) {
                 outputFile = Paths.get(markdownOutputFile);
             } else {
-                outputFile = Paths.get("book." + format.toLowerCase());
+                outputFile = Paths.get("book." + format.name().toLowerCase());
             }
             if (Files.isDirectory(outputFile)) {
                 // deleta arquivos do diretório recursivamente
